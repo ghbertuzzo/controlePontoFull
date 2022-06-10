@@ -36,6 +36,11 @@ public class HoraExtraController {
 		this.daohe_periodo = new DAO_He_Periodo(this.connection);
 	}
 
+	public HoraExtraController() throws SQLException, ClassNotFoundException {
+		this.diaController = new DiaController();
+		this.periodoController = new PeriodoController();
+	}
+
 	public void subHoraExtra() {
 		this.context.horaExtraView.setTable(calculaHoraExtra(this.context.horarioDeTrabalhoView,
 				this.context.marcacoesFeitasView, this.context.horaExtraView));
@@ -54,6 +59,14 @@ public class HoraExtraController {
 		horaExtraView.setListEntries(tableView.getListEntries());
 		horaExtraView.setListExits(tableView.getListExits());
 		return horaExtraView.getTable();
+	}
+	
+	public List<Periodo> calculaHoraExtraWeb(String json) {
+		Dia horarioTrabalhoDia = this.diaController.getConvertedDayHT(json);
+		Dia marcacoesFeitasDia = this.diaController.getConvertedDayMF(json);
+		Dia horaextraDia = this.diaController.getHoraExtra(marcacoesFeitasDia,horarioTrabalhoDia);
+		List<Periodo> listaPeriodosHoraExtra = this.periodoController.getPeriods(horaextraDia);
+		return listaPeriodosHoraExtra;
 	}
 
 	public int saveHoraExtra(HoraExtraView horaExtraView) throws SQLException {

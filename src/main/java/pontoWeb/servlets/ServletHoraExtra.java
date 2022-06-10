@@ -15,20 +15,22 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-import pontoWeb.controller.AtrasoController;
+import pontoWeb.controller.HoraExtraController;
 import pontoWeb.model.JSON_Periodos;
 import pontoWeb.model.Periodo;
 
-@WebServlet(urlPatterns = { "/atrasos" })
-public class ServletAtraso extends HttpServlet {
+@WebServlet(urlPatterns = { "/horaextra" })
+public class ServletHoraExtra extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	public ServletAtraso() {
+	public ServletHoraExtra() {
 
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
+		System.out.println("Chamou Get no /horaextra");
+		response.getWriter().append("Served at: ").append(request.getContextPath());
 	}
 
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -36,10 +38,10 @@ public class ServletAtraso extends HttpServlet {
 
 		//string conteudo json
 		String requestData = request.getReader().lines().collect(Collectors.joining());
-		//calcular atrasos
-		AtrasoController atrasoController = null;
+		//calcular horaextra
+		HoraExtraController heController = null;
 		try {
-			atrasoController = new AtrasoController();
+			heController = new HoraExtraController();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -47,15 +49,15 @@ public class ServletAtraso extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		List<Periodo> periodosAtrasos = atrasoController.calculaAtrasosWeb(requestData);
+		List<Periodo> periodosAtrasos = heController.calculaHoraExtraWeb(requestData);
 		//converter periodo de atrasos em string
-		JSON_Periodos atrasoslist = new JSON_Periodos();
+		JSON_Periodos horaextralist = new JSON_Periodos();
 		for(Periodo p: periodosAtrasos) {
-			atrasoslist.getPeriodos().add(p.getEntrada().toString());
-			atrasoslist.getPeriodos().add(p.getSaida().toString());
+			horaextralist.getPeriodos().add(p.getEntrada().toString());
+			horaextralist.getPeriodos().add(p.getSaida().toString());
 		}
 		Gson gson = new Gson(); 
-		String myjson = gson.toJson(atrasoslist); // converts to json
+		String myjson = gson.toJson(horaextralist); // converts to json
 	    System.out.println(myjson);	
 		
 		//converte string em json

@@ -24,6 +24,7 @@ import pontoWeb.model.Periodo;
 import pontoWeb.view.JanelaPrincipal;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
@@ -158,10 +159,28 @@ public class HistoricoController {
 		context.horarioDeTrabalhoView.renderTable();
 	}
 
-	public void exportReportHistorico(List<Historico> historicos, JanelaPrincipal context)
-			throws SQLException, FileNotFoundException, JRException {
-		List<ExtratoDia> listExtrato = getListExtrato(historicos, context);
+	public void exportReportHistorico(List<Historico> historicos)
+			throws SQLException, FileNotFoundException, JRException, ClassNotFoundException {
+		List<ExtratoDia> listExtrato = getListExtrato(historicos);
 		generateReport(listExtrato);
+	}
+	
+	public List<ExtratoDia> exportReportHistoricoWeb(List<Historico> historicos)
+			throws SQLException, FileNotFoundException, JRException, ClassNotFoundException {
+		List<ExtratoDia> listExtrato = getListExtrato(historicos);
+		return listExtrato;
+	}
+	
+	public void generateReportWeb(List<ExtratoDia> listExtrato) throws FileNotFoundException, JRException {
+		JRBeanCollectionDataSource itensJRBean = new JRBeanCollectionDataSource(listExtrato);
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("CollectionBeanParam", itensJRBean);
+		String reportPath = "src/main/java/pontoWeb/reports/RelatorioExtratoDia_2.jrxml";
+		InputStream input = new FileInputStream(new File(reportPath));
+		JasperDesign jasperDesign = JRXmlLoader.load(input);
+		JasperReport jr = JasperCompileManager.compileReport(jasperDesign);
+		JasperPrint jasperPrint = JasperFillManager.fillReport(jr, parameters, itensJRBean);
+		JasperExportManager.exportReportToPdfFile(jasperPrint, "src/main/java/pontoWeb/reports/report.pdf");
 	}
 
 	private void generateReport(List<ExtratoDia> listExtrato) throws FileNotFoundException, JRException {
@@ -176,16 +195,18 @@ public class HistoricoController {
 		JasperViewer.viewReport(jasperPrint,false);
 	}
 
-	private List<ExtratoDia> getListExtrato(List<Historico> historicos, JanelaPrincipal context) throws SQLException {
+	private List<ExtratoDia> getListExtrato(List<Historico> historicos) throws SQLException, ClassNotFoundException {
 		PeriodoController periodoController = new PeriodoController();
+		HoraExtraController heController = new HoraExtraController();
+		AtrasoController atController = new AtrasoController();
 		List<ExtratoDia> listExtrato = new ArrayList<ExtratoDia>();
 		listExtrato.add(null);
 		for (Historico historico : historicos) {
 			SimpleDateFormat formatador = new SimpleDateFormat("dd/MM/yyyy");
 			DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
-			List<Periodo> listPeriodsHE = context.heController.getPeriods(historico.getId_he());
+			List<Periodo> listPeriodsHE = heController.getPeriods(historico.getId_he());
 			long sumDay_HE = periodoController.sumBetweenPeriods(listPeriodsHE);
-			List<Periodo> listPeriodsAT = context.atController.getPeriods(historico.getId_at());
+			List<Periodo> listPeriodsAT = atController.getPeriods(historico.getId_at());
 			long sumDay_AT = periodoController.sumBetweenPeriods(listPeriodsAT);
 			LocalTime localtime_he = periodoController.numberToLocalTime((int) sumDay_HE);
 			String sumhoraextra = dtf.format(localtime_he);

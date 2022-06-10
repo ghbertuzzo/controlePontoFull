@@ -130,6 +130,9 @@ public class JanelaPrincipal extends JFrame {
 					} catch (JRException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
+					} catch (ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}
 				}
 			});
@@ -174,10 +177,10 @@ public class JanelaPrincipal extends JFrame {
 		return true;
 	}
 
-	public void exportReport() throws SQLException, FileNotFoundException, JRException {
+	public void exportReport() throws SQLException, FileNotFoundException, JRException, ClassNotFoundException {
 		List<Historico> historicos = this.historicoController.getHistoricos();
 		if (historicos != null) {
-			this.historicoController.exportReportHistorico(historicos, this);
+			this.historicoController.exportReportHistorico(historicos);
 		}
 
 	}

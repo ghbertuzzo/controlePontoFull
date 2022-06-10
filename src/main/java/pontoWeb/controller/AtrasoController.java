@@ -35,7 +35,7 @@ public class AtrasoController {
 		this.daoat_periodo = new DAO_At_Periodo(this.connection);
 	}
 	
-	public AtrasoController() {
+	public AtrasoController() throws SQLException, ClassNotFoundException {
 		this.diaController = new DiaController();
 		this.periodoController = new PeriodoController();
 	}

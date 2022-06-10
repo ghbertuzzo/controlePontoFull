@@ -8,7 +8,7 @@ public class ConnectionFactory {
 	
 	private Connection connection;
 	
-	public ConnectionFactory() throws SQLException {
+	public ConnectionFactory() throws SQLException, ClassNotFoundException {
 		this.connection = DriverManager.getConnection("jdbc:postgresql://127.0.0.1:5432/dbControlePonto", "postgres", "admin");
 	}
 
