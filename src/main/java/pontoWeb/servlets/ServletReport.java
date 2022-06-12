@@ -1,60 +1,70 @@
 package pontoWeb.servlets;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import net.sf.jasperreports.engine.JRException;
 import pontoWeb.controller.HistoricoController;
-import pontoWeb.db.ConnectionFactory;
-import pontoWeb.model.ExtratoDia;
-import pontoWeb.model.Historico;
+import pontoWeb.db.ConnectionFactoryDB;
 
 @WebServlet(urlPatterns = { "/export" })
 public class ServletReport extends HttpServlet {
+	
 	private static final long serialVersionUID = 1L;
+	private HistoricoController historicoController;
+	private ConnectionFactoryDB connection;
 
 	public ServletReport() {
 
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		ConnectionFactory connection = null;
 		try {
-			connection = new ConnectionFactory();
+			this.connection = new ConnectionFactoryDB();
+			this.historicoController = new HistoricoController(connection);
+			this.historicoController.generateReport(this.connection);
 		} catch (ClassNotFoundException | SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
+		} catch (JRException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
-		HistoricoController historicoController = null;
-		List<Historico> historicos = null;
-		List<ExtratoDia> listExtrato = null;
-		try {
-			historicoController = new HistoricoController(connection);
-			System.out.println("Buscando historico!");
-			historicos = historicoController.getHistoricos();
-			System.out.println("Captou historico!");
-			if (historicos != null) {
-				historicoController.exportReportHistorico(historicos);	
-				System.out.println("Gerando relatório");
-			}
-			historicoController.generateReportWeb(listExtrato);
-			System.out.println("Relatório gerado");
-		} catch (Exception e) {
-			System.out.println(e.getMessage());
-			System.out.println("Erro!");
-		}		
-	}
-
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		System.out.println("Chamou Post no /export");
-		doGet(request, response);
+		
+        response.setContentType("application/pdf");
+        response.setHeader("Content-Type", "application/pdf");
+        File filePDF = new File("C:\\Users\\MoriInfo\\Documents\\Softwares Dev\\controlePontoFull\\src\\main\\java\\pontoWeb\\reports\\report.pdf");
+        FileInputStream fis = new FileInputStream(filePDF);     
+        ServletOutputStream os = response.getOutputStream();
+        try
+        {
+            response.setContentLength((int) filePDF.length());
+            int byteRead = 0;
+            while ((byteRead = fis.read()) != -1)
+            {
+                os.write(byteRead);
+            }
+            os.flush();
+        }
+        catch (Exception excp)
+        {
+            excp.printStackTrace();
+        }
+        finally
+        {
+            os.close();
+            fis.close();
+        }
+				
 	}
 
 }

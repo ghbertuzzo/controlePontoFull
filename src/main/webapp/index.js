@@ -3,14 +3,28 @@ $(document).ready(function () {
 		var xhttp = new XMLHttpRequest();
 		xhttp.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
-				document.getElementById("demo").innerHTML = xhttp.responseText;
+				console.log(xhttp.responseText);
+				axios
+					.get(`src/main/java/pontoWeb/reports/report.pdf`, {
+						responseType: 'arraybuffer'
+					})
+					.then(response => {
+						const blob = new Blob(
+							[response.data],
+							{ type: 'application/pdf' }
+						)
+						const link = document.createElement('a');
+						link.href = window.URL.createObjectURL(blob);
+						link.download = "file.pdf";
+						link.click();
+					})
 			}
 		};
 		xhttp.open("GET", "export", true);
 		xhttp.send();
-		console.log("Get enviado!");
 	});
 });
+
 //BOTÃO CALCULO ATRASOS 
 $(document).ready(function () {
 	$("#btn_calc_at").on("click", function () {

@@ -8,19 +8,10 @@ import java.util.List;
 
 public class DAO_At_Periodo {
 
-	private ConnectionFactory connection;
+	private ConnectionFactoryDB connection;
 
-	public DAO_At_Periodo(ConnectionFactory connection) throws SQLException {
+	public DAO_At_Periodo(ConnectionFactoryDB connection) throws SQLException {
 		this.connection = connection;
-	}
-
-	public void insert(int idAt, int idPeriodo) throws SQLException {
-		String querysql = "INSERT INTO \"schemaControlePonto\".at_periodo(id, id_at, id_periodo) VALUES (default, ?, ?);";
-		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql);
-		ps.setInt(1, idAt);
-		ps.setInt(2, idPeriodo);
-		ps.execute();
-		ps.close();
 	}
 	
 	public List<Integer> getPeriods(int idAT) throws SQLException {

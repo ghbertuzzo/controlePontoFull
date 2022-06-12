@@ -2,14 +2,12 @@ package pontoWeb.controller;
 
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import com.google.gson.Gson;
 
 import pontoWeb.model.Dia;
 import pontoWeb.model.JSON_Periodos;
 import pontoWeb.model.Periodo;
-import pontoWeb.view.TabelaView;
 
 public class DiaController {
 
@@ -26,16 +24,6 @@ public class DiaController {
 
 	public Integer localTimeToNumber(LocalTime localTime) {
 		return (localTime.getHour() * 60 + localTime.getMinute());
-	}
-
-	public Dia getConvertedDay(TabelaView tableView) {
-		List<Periodo> listOfPeriods = new ArrayList<Periodo>();
-		for (int i = 0; i < tableView.getListEntries().size(); i++) {
-			Periodo period = new Periodo(tableView.getListEntries().get(i), tableView.getListExits().get(i));
-			listOfPeriods.add(period);
-		}
-		Dia day = this.periodoController.setPeriods(listOfPeriods);
-		return day;
 	}
 
 	public Dia getAtrasos(Dia horarioTrabalho, Dia marcacoesFeitas) {

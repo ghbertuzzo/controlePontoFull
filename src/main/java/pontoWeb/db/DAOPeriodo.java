@@ -10,31 +10,10 @@ import pontoWeb.model.Periodo;
 
 public class DAOPeriodo {
 
-	private ConnectionFactory connection;
+	private ConnectionFactoryDB connection;
 
-	public DAOPeriodo(ConnectionFactory connection) throws SQLException {
+	public DAOPeriodo(ConnectionFactoryDB connection) throws SQLException {
 		this.connection = connection;
-	}
-
-	public int insert(int entry, int exit) throws SQLException {
-		String querysql = "INSERT INTO \"schemaControlePonto\".periodo(id, entry, exit) VALUES (default, ?, ?);";
-		String generatedColumns[] = { "id" };
-		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql, generatedColumns);
-		ps.setInt(1, entry);
-		ps.setInt(2, exit);
-		int affectedRows = ps.executeUpdate();
-		long id = -1;
-		if (affectedRows > 0) {
-			try (ResultSet rs = ps.getGeneratedKeys()) {
-				if (rs.next()) {
-					id = rs.getLong(1);
-				}
-			} catch (SQLException ex) {
-				System.out.println(ex.getMessage());
-			}
-		}
-		ps.close();
-		return (int) id;
 	}
 
 	public Periodo getPeriodoByID(int idPeriodo) throws SQLException {

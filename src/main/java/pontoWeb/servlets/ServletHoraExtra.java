@@ -2,7 +2,6 @@ package pontoWeb.servlets;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,47 +26,37 @@ public class ServletHoraExtra extends HttpServlet {
 
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		System.out.println("Chamou Get no /horaextra");
-		response.getWriter().append("Served at: ").append(request.getContextPath());
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
+
 	}
 
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
+	protected void doPost(HttpServletRequest request, HttpServletResponse response)	throws ServletException, IOException {
 
-		//string conteudo json
+		//CONVERTE P/ JSONSTR CONTEÚDO DA REQUEST
 		String requestData = request.getReader().lines().collect(Collectors.joining());
-		//calcular horaextra
-		HoraExtraController heController = null;
-		try {
-			heController = new HoraExtraController();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		List<Periodo> periodosAtrasos = heController.calculaHoraExtraWeb(requestData);
-		//converter periodo de atrasos em string
+
+		//EFETUA CÁLCULOS PARA OBTER TODOS OS PERÍODOS DE HORA EXTRA
+		HoraExtraController horaExtraController = new HoraExtraController();
+		List<Periodo> periodosHoraExtra = horaExtraController.calculaHoraExtraWeb(requestData);
+		
+		//CONVERTE PERÍODOS DE HORA EXTRA EM STRING
 		JSON_Periodos horaextralist = new JSON_Periodos();
-		for(Periodo p: periodosAtrasos) {
+		for(Periodo p: periodosHoraExtra) {
 			horaextralist.getPeriodos().add(p.getEntrada().toString());
 			horaextralist.getPeriodos().add(p.getSaida().toString());
 		}
 		Gson gson = new Gson(); 
-		String myjson = gson.toJson(horaextralist); // converts to json
-	    System.out.println(myjson);	
+		String listaHoraExtraJSONStr = gson.toJson(horaextralist);
+
 		
-		//converte string em json
-		JsonObject convertedObject = new Gson().fromJson(myjson, JsonObject.class);
+		//CONVERTE STR EM JSON
+		JsonObject listaHoraExtraJSON = new Gson().fromJson(listaHoraExtraJSONStr, JsonObject.class);
 		
-		//envia response com json
+		//ENVIA RESPOSTA DA REQUEST
 		PrintWriter out = response.getWriter();
 		response.setContentType("application/json");
 		response.setCharacterEncoding("UTF-8");
-		out.print(convertedObject);
+		out.print(listaHoraExtraJSON);
 		out.flush();
 	}
 
