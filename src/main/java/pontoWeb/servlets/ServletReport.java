@@ -28,10 +28,11 @@ public class ServletReport extends HttpServlet {
 	}
 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		String caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports" + File.separator + "RelatorioExtratoDia_2.jrxml");
 		try {
 			this.connection = new ConnectionFactoryDB();
 			this.historicoController = new HistoricoController(connection);
-			this.historicoController.generateReport(this.connection);
+			this.historicoController.generateReport(this.connection,caminho);
 		} catch (ClassNotFoundException | SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -42,7 +43,8 @@ public class ServletReport extends HttpServlet {
 		
         response.setContentType("application/pdf");
         response.setHeader("Content-Type", "application/pdf");
-        File filePDF = new File("C:\\Users\\MoriInfo\\Documents\\Softwares Dev\\controlePontoFull\\src\\main\\java\\pontoWeb\\reports\\report.pdf");
+        caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports/");
+        File filePDF = new File(caminho + "report.pdf");
         FileInputStream fis = new FileInputStream(filePDF);     
         ServletOutputStream os = response.getOutputStream();
         try

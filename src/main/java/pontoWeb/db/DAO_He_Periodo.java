@@ -27,4 +27,13 @@ public class DAO_He_Periodo {
 		ps.close();
 		return listIds;
 	}
+	
+	public void insert(int idHe, int idPeriodo) throws SQLException {
+		String querysql = "INSERT INTO \"schemaControlePonto\".he_periodo(id, id_he, id_periodo) VALUES (default, ?, ?);";
+		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql);
+		ps.setInt(1, idHe);
+		ps.setInt(2, idPeriodo);
+		ps.execute();
+		ps.close();
+	}
 }
