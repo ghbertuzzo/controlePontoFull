@@ -43,10 +43,12 @@ public class ServletReport extends HttpServlet {
 		
         response.setContentType("application/pdf");
         response.setHeader("Content-Type", "application/pdf");
+        response.addHeader("Content-Disposition", "attachment; filename=report.pdf");
         caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports/");
         File filePDF = new File(caminho + "report.pdf");
         FileInputStream fis = new FileInputStream(filePDF);     
         ServletOutputStream os = response.getOutputStream();
+        
         try
         {
             response.setContentLength((int) filePDF.length());

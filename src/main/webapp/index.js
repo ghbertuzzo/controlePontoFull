@@ -2,55 +2,119 @@
 $(document).ready(function () {
 	$("#btn_export").on("click", function () {
 		var xhttp = new XMLHttpRequest();
+		xhttp.responseType = 'blob';
 		xhttp.onreadystatechange = function () {
 			if (this.readyState == 4 && this.status == 200) {
 				var blob = new Blob([xhttp.response], { type: "application/pdf" });
 				var link = document.createElement('a');
 				link.href = window.URL.createObjectURL(blob);
-				var fileName = "report";
+				var fileName = "report.pdf";
 				link.download = fileName;
 				link.click();
-				/*			
-				
-								
-				var file = new Blob([xhttp.response], { type: 'application/pdf' });
-				var fileURL = URL.createObjectURL(file);
-				window.open(fileURL);*/
 			}
-
 		};
 		xhttp.open("GET", "export", true);
 		xhttp.send();
 	});
 });
 
-function generateJSON(obj) {
-	var sizetableHt = document.getElementById("tab_logicHT").rows.length;
-	var sizetableMf = document.getElementById("tab_logicMF").rows.length;
-	let myvar;
-	obj = new Object();
-	//DADOS DO HORARIO DE TRABALHO
-	var periodos = [];
-	for (let i = 1; i < sizetableHt - 1; i++) {
-		myvar = "entrada_HT" + i;
-		periodos.push($("[name=" + myvar + "]")[0].value);
-		myvar = "saida_HT" + i;
-		periodos.push($("[name=" + myvar + "]")[0].value);
-	}
-	//DIVISOR NA LISTA ENTRE HT E MF
-	periodos.push("-");
-	//DADOS DAS MARCACOES FEITAS
-	for (let i = 1; i < sizetableMf - 1; i++) {
-		myvar = "entrada_MF" + i;
-		periodos.push($("[name=" + myvar + "]")[0].value);
-		yvar = "saida_MF" + i;
-		periodos.push($("[name=" + myvar + "]")[0].value);
-	}
-	obj.periodos = periodos;
-}
+//BOTÃO SALVAR
+$(document).ready(function () {
+	$("#btn_save").on("click", function () {
+		//CRIA JSON COM HT E MF
+		var obj = new Object();
+		var sizetableHt = document.getElementById("tab_logicHT").rows.length;
+		var sizetableMf = document.getElementById("tab_logicMF").rows.length;
+		let myvar;
+
+		//DADOS DO HORARIO DE TRABALHO
+		var periodos = [];
+
+		for (let i = 1; i < sizetableHt - 1; i++) {
+			myvar = "entrada_HT" + i;
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
+			myvar = "saida_HT" + i;
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
+		}
+		//DIVISOR NA LISTA ENTRE HT E MF
+		periodos.push("-");
+		//DADOS DAS MARCACOES FEITAS
+		for (let i = 1; i < sizetableMf - 1; i++) {
+			myvar = "entrada_MF" + i;
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
+			myvar = "saida_MF" + i;
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
+		}
+		obj.periodos = periodos;
+		if ($("[name=dataform]")[0].value != "") {
+			obj.data = $("[name=dataform]")[0].value;
+			//convert object to json string
+			var data = JSON.stringify(obj);
+			//send request post p calculo de atrasos
+			var xhr = new XMLHttpRequest();
+			var url = "salvar";
+			xhr.open("POST", url, true);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState === 4 && xhr.status === 200) {
+					addHistorico(xhr.responseText);
+				}
+			};
+			xhr.send(data);
+		} else {
+			alert("Informe uma data válida!");
+		}
+	});
+});
+
+//BOTÃO CARREGAR
+$(document).ready(function () {
+	var myTableHT = document.getElementById("tab_logicHT");
+	myTableHT.oldHTML = myTableHT.innerHTML;
+	var myTableMF = document.getElementById("tab_logicMF");
+	myTableMF.oldHTML = myTableMF.innerHTML;
+	var myTableHE = document.getElementById("tab_logicHE");
+	myTableHE.oldHTML = myTableHE.innerHTML;
+	var myTableAT = document.getElementById("tab_logicAT");
+	myTableAT.oldHTML = myTableAT.innerHTML;
+	$("#btn_load").on("click", function () {
+		var obj = new Object();
+		if ($("[name=dataform]")[0].value != "") {
+			obj.data = $("[name=dataform]")[0].value;
+			myTableHT.innerHTML = myTableHT.oldHTML;
+			myTableMF.innerHTML = myTableMF.oldHTML;
+			myTableAT.innerHTML = myTableAT.oldHTML;
+			myTableHE.innerHTML = myTableHE.oldHTML;
+			var data = JSON.stringify(obj);
+			//send request post
+			var xhr = new XMLHttpRequest();
+			var url = "carregar";
+			xhr.open("POST", url, true);
+			xhr.setRequestHeader("Content-Type", "application/json");
+			xhr.onreadystatechange = function () {
+				if (xhr.readyState === 4 && xhr.status === 200) {
+					loadHistorico(xhr.responseText);
+				}
+			};
+			xhr.send(data);
+		} else {
+			alert("Informe uma data válida!");
+		}
+	});
+});
 
 //BOTÃO CALCULO ATRASOS 
 $(document).ready(function () {
+	var myTableAT = document.getElementById("tab_logicAT");
+	myTableAT.oldHTML = myTableAT.innerHTML;
 	$("#btn_calc_at").on("click", function () {
 		//CRIA JSON COM HT E MF		
 		var obj = new Object();
@@ -62,21 +126,29 @@ $(document).ready(function () {
 		var periodos = [];
 		for (let i = 1; i < sizetableHt - 1; i++) {
 			myvar = "entrada_HT" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
 			myvar = "saida_HT" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
 		}
 		//DIVISOR NA LISTA ENTRE HT E MF
 		periodos.push("-");
 		//DADOS DAS MARCACOES FEITAS
 		for (let i = 1; i < sizetableMf - 1; i++) {
 			myvar = "entrada_MF" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
 			myvar = "saida_MF" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
 		}
 		obj.periodos = periodos;
-		//convert object to json string
+		myTableAT.innerHTML = myTableAT.oldHTML;
 		var data = JSON.stringify(obj);
 		console.log(JSON.stringify(obj));
 		//send request post		
@@ -88,13 +160,15 @@ $(document).ready(function () {
 			if (xhr.readyState === 4 && xhr.status === 200) {
 				addLinesAtrasos(JSON.parse(xhr.responseText));
 			}
-		};
+		}
 		xhr.send(data);
 	});
 });
 
 //BOTÃO CALCULO HORAEXTRA 
 $(document).ready(function () {
+	var myTableHE = document.getElementById("tab_logicHE");
+	myTableHE.oldHTML = myTableHE.innerHTML;
 	$("#btn_calc_he").on("click", function () {
 		//CRIA JSON COM HT E MF
 		var obj = new Object();
@@ -105,21 +179,30 @@ $(document).ready(function () {
 		var periodos = [];
 		for (let i = 1; i < sizetableHt - 1; i++) {
 			myvar = "entrada_HT" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
 			myvar = "saida_HT" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
 		}
 		//DIVISOR NA LISTA ENTRE HT E MF
 		periodos.push("-");
 		//DADOS DAS MARCACOES FEITAS
 		for (let i = 1; i < sizetableMf - 1; i++) {
 			myvar = "entrada_MF" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
 			myvar = "saida_MF" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
+			if ($("[name=" + myvar + "]")[0].value != "") {
+				periodos.push($("[name=" + myvar + "]")[0].value);
+			}
 		}
 		obj.periodos = periodos;
 		//convert object to json string
+		myTableHE.innerHTML = myTableHE.oldHTML;
 		var data = JSON.stringify(obj);
 		//send request post		
 		var xhr = new XMLHttpRequest();
@@ -550,71 +633,6 @@ function addLinesHoraExtra(jsonobj) {
 		j += 2;
 	}
 }
-
-//BOTÃO SALVAR
-$(document).ready(function () {
-	$("#btn_save").on("click", function () {
-		//CRIA JSON COM HT E MF
-		var obj = new Object();
-		var sizetableHt = document.getElementById("tab_logicHT").rows.length;
-		var sizetableMf = document.getElementById("tab_logicMF").rows.length;
-		let myvar;
-
-		//DADOS DO HORARIO DE TRABALHO
-		var periodos = [];
-		for (let i = 1; i < sizetableHt - 1; i++) {
-			myvar = "entrada_HT" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
-			myvar = "saida_HT" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
-		}
-		//DIVISOR NA LISTA ENTRE HT E MF
-		periodos.push("-");
-		//DADOS DAS MARCACOES FEITAS
-		for (let i = 1; i < sizetableMf - 1; i++) {
-			myvar = "entrada_MF" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
-			myvar = "saida_MF" + i;
-			periodos.push($("[name=" + myvar + "]")[0].value);
-		}
-		obj.periodos = periodos;
-		obj.data = $("[name=dataform]")[0].value;
-		//convert object to json string
-		var data = JSON.stringify(obj);
-		//send request post p calculo de atrasos
-		var xhr = new XMLHttpRequest();
-		var url = "salvar";
-		xhr.open("POST", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.onreadystatechange = function () {
-			if (xhr.readyState === 4 && xhr.status === 200) {
-				addHistorico(xhr.responseText);
-			}
-		};
-		xhr.send(data);
-	});
-});
-
-//BOTÃO CARREGAR
-$(document).ready(function () {
-	$("#btn_load").on("click", function () {
-		var obj = new Object();
-		obj.data = $("[name=dataform]")[0].value;
-		//convert object to json string
-		var data = JSON.stringify(obj);
-		//send request post
-		var xhr = new XMLHttpRequest();
-		var url = "carregar";
-		xhr.open("POST", url, true);
-		xhr.setRequestHeader("Content-Type", "application/json");
-		xhr.onreadystatechange = function () {
-			if (xhr.readyState === 4 && xhr.status === 200) {
-				loadHistorico(xhr.responseText);
-			}
-		};
-		xhr.send(data);
-	});
-});
 
 //TABELA HORARIO DE TRABALHO
 $(document).ready(function () {
