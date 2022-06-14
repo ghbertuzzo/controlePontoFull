@@ -14,6 +14,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
@@ -22,6 +24,7 @@ import pontoWeb.db.DAOHistorico;
 import pontoWeb.model.Dia;
 import pontoWeb.model.ExtratoDia;
 import pontoWeb.model.Historico;
+import pontoWeb.model.JSON_Periodos;
 import pontoWeb.model.Periodo;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JasperCompileManager;
@@ -43,21 +46,22 @@ public class HistoricoController {
 		this.daoHistorico = new DAOHistorico(this.connection);
 	}
 
-	public void generateReportHistorico(List<Historico> historicos, ConnectionFactoryDB connection, String path)
+	public void generateReportHistorico(List<Historico> historicos, ConnectionFactoryDB connection, String path, HttpServletRequest request)
 			throws ClassNotFoundException, SQLException, FileNotFoundException, JRException {
 		List<ExtratoDia> listExtrato = getListExtrato(historicos, connection);
-		generateReportWeb(listExtrato, path);
+		generateReportWeb(listExtrato, path, request);
 	}
 
-	public void generateReportWeb(List<ExtratoDia> listExtrato, String path) throws FileNotFoundException, JRException {
+	public void generateReportWeb(List<ExtratoDia> listExtrato, String path, HttpServletRequest request) throws FileNotFoundException, JRException {
+		String caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports"+ File.separator + "myreport.pdf");
 		JRBeanCollectionDataSource itensJRBean = new JRBeanCollectionDataSource(listExtrato);
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("CollectionBeanParam", itensJRBean);
-		InputStream input = new FileInputStream(new File(path));
+		InputStream input = new FileInputStream(new File(path));		
 		JasperDesign jasperDesign = JRXmlLoader.load(input);
 		JasperReport jr = JasperCompileManager.compileReport(jasperDesign);
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jr, parameters, itensJRBean);
-		JasperExportManager.exportReportToPdfFile(jasperPrint, path);
+		JasperExportManager.exportReportToPdfFile(jasperPrint, caminho);
 	}
 
 	private List<ExtratoDia> getListExtrato(List<Historico> historicos, ConnectionFactoryDB connection)
@@ -100,15 +104,15 @@ public class HistoricoController {
 		return this.daoHistorico.getHistoricos(connection);
 	}
 
-	public void generateReport(ConnectionFactoryDB connection, String path)
+	public void generateReport(ConnectionFactoryDB connection, String path,HttpServletRequest request)
 			throws SQLException, ClassNotFoundException, FileNotFoundException, JRException {
 		List<Historico> listaHistorico = getHistoricos(connection);
 		if (listaHistorico != null) {
-			generateReportHistorico(listaHistorico, connection, path);
+			generateReportHistorico(listaHistorico, connection, path, request);
 		}
 	}
 
-	public Boolean addHistorico(String requestData) {
+	public Boolean addHistorico(String requestData) throws SQLException {
 		// CONVERTE EM PERÍODOS DE HORARIO DE TRABALHO e PERÍODOS DE MARCACOES FEITAS
 		DiaController diaController = new DiaController();
 		Dia horarioTrabalhoDia = diaController.getConvertedDayHT(requestData);
@@ -130,33 +134,67 @@ public class HistoricoController {
 		JsonObject jsonObject = gson.fromJson(requestData, JsonObject.class);
 		String date = jsonObject.get("data").getAsString();
 
-		// SETA COMMIT COMO FALSO
 		int idHT = -1;
 		int idMF = -1;
 		int idAT = -1;
 		int idHE = -1;
-		try {
-			this.connection.getConnection().setAutoCommit(false);
+		// SETA COMMIT COMO FALSO
+
+		this.connection.getConnection().setAutoCommit(false);
+
+		// VERIFICA SE JÁ EXISTE REGISTRO NESSA DATA
+		Historico historico = this.daoHistorico.getHistoricoByDate(date);
+
+		// SE NÃO EXISTE, CRIA
+		if (historico == null) {
 			// ADD NOVO HORARIO DE TRABALHO
 			HorarioDeTrabalhoController htController = new HorarioDeTrabalhoController(connection);
 			idHT = htController.saveHorarioDeTrabalho(listaPeriodosHorararioTrabalho);
+
 			// ADD NOVA MARCACOES FEITAS
 			MarcacoesFeitasController mfController = new MarcacoesFeitasController(connection);
 			idMF = mfController.saveMarcacoesFeitas(listaPeriodosMarcacoesFeitas);
+
 			// ADD ATRASOS
 			idAT = atrasoController.saveAtrasos(listaPeriodosAtrasos);
+
 			// ADD HORAEXTRAS
 			idHE = horaExtraController.saveHoraExtra(listaPeriodosHoraExtra);
+
 			// ADD HISTORICO DIA
 			DAOHistorico daoHistorico = new DAOHistorico(connection);
 			daoHistorico.insert(date, idHT, idMF, idHE, idAT);
+
 			// SE PASSOU TUDO, COMMIT
 			this.connection.getConnection().commit();
 			return true;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return false;
+
+			// MAS SE EXISTE, APAGA E SOBRESCREVE
+		} else {
+			// APAGA REGISTRO ANTIGO
+			this.daoHistorico.delete(historico.getId());
+
+			// ADD NOVO HORARIO DE TRABALHO
+			HorarioDeTrabalhoController htController = new HorarioDeTrabalhoController(connection);
+			idHT = htController.saveHorarioDeTrabalho(listaPeriodosHorararioTrabalho);
+
+			// ADD NOVA MARCACOES FEITAS
+			MarcacoesFeitasController mfController = new MarcacoesFeitasController(connection);
+			idMF = mfController.saveMarcacoesFeitas(listaPeriodosMarcacoesFeitas);
+
+			// ADD ATRASOS
+			idAT = atrasoController.saveAtrasos(listaPeriodosAtrasos);
+
+			// ADD HORAEXTRAS
+			idHE = horaExtraController.saveHoraExtra(listaPeriodosHoraExtra);
+
+			// ADD HISTORICO DIA
+			DAOHistorico daoHistorico = new DAOHistorico(connection);
+			daoHistorico.insert(date, idHT, idMF, idHE, idAT);
+
+			// SE PASSOU TUDO, COMMIT
+			this.connection.getConnection().commit();
+			return true;
 		}
 	}
 
@@ -166,10 +204,58 @@ public class HistoricoController {
 		JsonObject jsonObject = gson.fromJson(requestData, JsonObject.class);
 		String date = jsonObject.get("data").getAsString();
 		Historico historico = this.daoHistorico.getHistoricoByDate(date);
-		if(historico!=null)
+		if (historico != null)
 			return historico;
 		else
 			return null;
+	}
+
+	public JSON_Periodos generateListPeriods(Historico historico) throws SQLException {
+		List<Periodo> listaPeriodosHorararioTrabalho = null;
+		List<Periodo> listaPeriodosMarcacoesFeitas = null;
+		List<Periodo> listaPeriodosHoraExtra = null;
+		List<Periodo> listaPeriodosAtrasos = null;
+		// BUSCA PERIODOS DE HT DO DIA
+		HorarioDeTrabalhoController htController = new HorarioDeTrabalhoController(this.connection);
+		listaPeriodosHorararioTrabalho = htController.getPeriods(historico.getId_ht());
+
+		// BUSCA PERIODOS DE MF DO DIA
+		MarcacoesFeitasController mfController = new MarcacoesFeitasController(this.connection);
+		listaPeriodosMarcacoesFeitas = mfController.getPeriods(historico.getId_mf());
+
+		// BUSCA PERIODOS DE ATRASO DO DIA
+		AtrasoController atController = new AtrasoController(this.connection);
+		listaPeriodosAtrasos = atController.getPeriods(historico.getId_at());
+
+		// BUSCA PERIODOS DE HORAEXTRA DO DIA
+		HoraExtraController heController = new HoraExtraController(this.connection);
+		listaPeriodosHoraExtra = heController.getPeriods(historico.getId_he());
+
+		// CONVERTE PERÍODOS EM STRING
+		JSON_Periodos listaPeriodos = new JSON_Periodos();
+		for (Periodo p : listaPeriodosHorararioTrabalho) {
+			listaPeriodos.getPeriodos().add(p.getEntrada().toString());
+			listaPeriodos.getPeriodos().add(p.getSaida().toString());
+		}
+		// ADD SEPARADOR (FIM HT)
+		listaPeriodos.getPeriodos().add("-");
+		for (Periodo p : listaPeriodosMarcacoesFeitas) {
+			listaPeriodos.getPeriodos().add(p.getEntrada().toString());
+			listaPeriodos.getPeriodos().add(p.getSaida().toString());
+		}
+		// ADD SEPARADOR (FIM MF)
+		listaPeriodos.getPeriodos().add("-");
+		for (Periodo p : listaPeriodosAtrasos) {
+			listaPeriodos.getPeriodos().add(p.getEntrada().toString());
+			listaPeriodos.getPeriodos().add(p.getSaida().toString());
+		}
+		// ADD SEPARADOR (FIM AT)
+		listaPeriodos.getPeriodos().add("-");
+		for (Periodo p : listaPeriodosHoraExtra) {
+			listaPeriodos.getPeriodos().add(p.getEntrada().toString());
+			listaPeriodos.getPeriodos().add(p.getSaida().toString());
+		}
+		return listaPeriodos;
 	}
 
 }

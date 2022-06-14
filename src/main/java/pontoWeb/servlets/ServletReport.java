@@ -32,7 +32,7 @@ public class ServletReport extends HttpServlet {
 		try {
 			this.connection = new ConnectionFactoryDB();
 			this.historicoController = new HistoricoController(connection);
-			this.historicoController.generateReport(this.connection,caminho);
+			this.historicoController.generateReport(this.connection,caminho,request);
 		} catch (ClassNotFoundException | SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -45,7 +45,7 @@ public class ServletReport extends HttpServlet {
         response.setHeader("Content-Type", "application/pdf");
         response.addHeader("Content-Disposition", "attachment; filename=report.pdf");
         caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports/");
-        File filePDF = new File(caminho + "report.pdf");
+        File filePDF = new File(caminho + "myreport.pdf");
         FileInputStream fis = new FileInputStream(filePDF);     
         ServletOutputStream os = response.getOutputStream();
         

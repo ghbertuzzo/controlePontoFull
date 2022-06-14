@@ -56,4 +56,12 @@ public class DAOHistorico {
 		ps.close();
 		return historico;
 	}
+	
+	public void delete(int id) throws SQLException {
+		String querysql = "DELETE FROM \"schemaControlePonto\".historico WHERE id=?;";
+		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql);		
+		ps.setInt(1, id);		
+		ps.executeUpdate();
+		ps.close();
+	}
 }
