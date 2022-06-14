@@ -16,7 +16,7 @@ public class DAOHoraExtra {
 		String querysql = "INSERT INTO \"schemaControlePonto\".hora_extra (id) VALUES (DEFAULT);";
 		String generatedColumns[] = { "id" };
 		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql, generatedColumns);
-		int affectedRows = ps.executeUpdate(querysql,generatedColumns);
+		int affectedRows = ps.executeUpdate(querysql, generatedColumns);
 		long id = -1;
 		if (affectedRows > 0) {
 			try (ResultSet rs = ps.getGeneratedKeys()) {

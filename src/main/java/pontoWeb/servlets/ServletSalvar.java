@@ -42,13 +42,13 @@ public class ServletSalvar extends HttpServlet {
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
-		if(opSuccess) {
+		}
+		if (opSuccess) {
 			JSON_Periodos listaPeriodos = new JSON_Periodos();
 			listaPeriodos.getPeriodos().add("sucesso");
 			Gson gson = new Gson();
 			String listaPeriodosJSONStr = gson.toJson(listaPeriodos);
-			
+
 			// CONVERTE STR EM JSON
 			JsonObject listaAtrasosJSON = new Gson().fromJson(listaPeriodosJSONStr, JsonObject.class);
 
@@ -58,12 +58,12 @@ public class ServletSalvar extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			out.print(listaAtrasosJSON);
 			out.flush();
-		}else {
+		} else {
 			JSON_Periodos listaPeriodos = new JSON_Periodos();
 			listaPeriodos.getPeriodos().add("vazio");
 			Gson gson = new Gson();
 			String listaPeriodosJSONStr = gson.toJson(listaPeriodos);
-			
+
 			// CONVERTE STR EM JSON
 			JsonObject listaAtrasosJSON = new Gson().fromJson(listaPeriodosJSONStr, JsonObject.class);
 
@@ -73,8 +73,8 @@ public class ServletSalvar extends HttpServlet {
 			response.setCharacterEncoding("UTF-8");
 			out.print(listaAtrasosJSON);
 			out.flush();
-		}		
-		
+		}
+
 	}
 
 }

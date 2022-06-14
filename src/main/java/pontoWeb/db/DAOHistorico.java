@@ -11,11 +11,11 @@ import pontoWeb.model.Historico;
 public class DAOHistorico {
 
 	private ConnectionFactoryDB connection;
-	
+
 	public DAOHistorico(ConnectionFactoryDB connection) {
 		this.connection = connection;
 	}
-	
+
 	public List<Historico> getHistoricos(ConnectionFactoryDB connection) throws SQLException {
 		this.connection = connection;
 		List<Historico> historicos = new ArrayList<Historico>();
@@ -24,13 +24,14 @@ public class DAOHistorico {
 		ResultSet rs;
 		rs = ps.executeQuery();
 		while (rs.next()) {
-			Historico historico = new Historico(rs.getDate(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5),rs.getInt(6));
+			Historico historico = new Historico(rs.getDate(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5),
+					rs.getInt(6));
 			historicos.add(historico);
 		}
 		ps.close();
 		return historicos;
 	}
-	
+
 	public void insert(String date, int idHT, int idMF, int idHE, int idAT) throws SQLException {
 		String querysql = "INSERT INTO \"schemaControlePonto\".historico(id, date, id_ht, id_mf, id_he, id_at) VALUES (default, ?, ?, ?, ?, ?);";
 		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql);
@@ -42,7 +43,7 @@ public class DAOHistorico {
 		ps.execute();
 		ps.close();
 	}
-	
+
 	public Historico getHistoricoByDate(String date) throws SQLException {
 		Historico historico = null;
 		String querysql = "SELECT date, id, id_ht, id_mf, id_he, id_at	FROM \"schemaControlePonto\".historico WHERE date=?;";
@@ -51,16 +52,17 @@ public class DAOHistorico {
 		ResultSet rs;
 		rs = ps.executeQuery();
 		while (rs.next()) {
-			historico = new Historico(rs.getDate(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5),rs.getInt(6));
+			historico = new Historico(rs.getDate(1), rs.getInt(2), rs.getInt(3), rs.getInt(4), rs.getInt(5),
+					rs.getInt(6));
 		}
 		ps.close();
 		return historico;
 	}
-	
+
 	public void delete(int id) throws SQLException {
 		String querysql = "DELETE FROM \"schemaControlePonto\".historico WHERE id=?;";
-		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql);		
-		ps.setInt(1, id);		
+		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql);
+		ps.setInt(1, id);
 		ps.executeUpdate();
 		ps.close();
 	}

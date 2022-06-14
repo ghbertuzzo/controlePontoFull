@@ -1,5 +1,6 @@
 //BOTÃO EXPORT
 $(document).ready(function () {
+
 	$("#btn_export").on("click", function () {
 		var xhttp = new XMLHttpRequest();
 		xhttp.responseType = 'blob';
@@ -20,8 +21,8 @@ $(document).ready(function () {
 
 //BOTÃO SALVAR
 $(document).ready(function () {
+
 	$("#btn_save").on("click", function () {
-		//CRIA JSON COM HT E MF
 		var obj = new Object();
 		var sizetableHt = document.getElementById("tab_logicHT").rows.length;
 		var sizetableMf = document.getElementById("tab_logicMF").rows.length;
@@ -29,7 +30,6 @@ $(document).ready(function () {
 
 		//DADOS DO HORARIO DE TRABALHO
 		var periodos = [];
-
 		for (let i = 1; i < sizetableHt - 1; i++) {
 			myvar = "entrada_HT" + i;
 			if ($("[name=" + myvar + "]")[0].value != "") {
@@ -40,8 +40,10 @@ $(document).ready(function () {
 				periodos.push($("[name=" + myvar + "]")[0].value);
 			}
 		}
+
 		//DIVISOR NA LISTA ENTRE HT E MF
 		periodos.push("-");
+
 		//DADOS DAS MARCACOES FEITAS
 		for (let i = 1; i < sizetableMf - 1; i++) {
 			myvar = "entrada_MF" + i;
@@ -54,11 +56,12 @@ $(document).ready(function () {
 			}
 		}
 		obj.periodos = periodos;
+
+		//VALIDA CAMPO DATA
 		if ($("[name=dataform]")[0].value != "") {
 			obj.data = $("[name=dataform]")[0].value;
-			//convert object to json string
+
 			var data = JSON.stringify(obj);
-			//send request post p calculo de atrasos
 			var xhr = new XMLHttpRequest();
 			var url = "salvar";
 			xhr.open("POST", url, true);
@@ -77,6 +80,8 @@ $(document).ready(function () {
 
 //BOTÃO CARREGAR
 $(document).ready(function () {
+
+	//CRIA BACKUP DAS LINHAS DAS 4 TABELAS INICIAIS
 	var myTableHT = document.getElementById("tab_logicHT");
 	myTableHT.oldHTML = myTableHT.innerHTML;
 	var myTableMF = document.getElementById("tab_logicMF");
@@ -85,16 +90,21 @@ $(document).ready(function () {
 	myTableHE.oldHTML = myTableHE.innerHTML;
 	var myTableAT = document.getElementById("tab_logicAT");
 	myTableAT.oldHTML = myTableAT.innerHTML;
+
 	$("#btn_load").on("click", function () {
 		var obj = new Object();
+
+		//VALIDA CAMPO DE DATA
 		if ($("[name=dataform]")[0].value != "") {
 			obj.data = $("[name=dataform]")[0].value;
+
+			//RESTAURA TABELAS NO MODO INICIAL ANTES DE CARREGAR HISTÓRICO
 			myTableHT.innerHTML = myTableHT.oldHTML;
 			myTableMF.innerHTML = myTableMF.oldHTML;
 			myTableAT.innerHTML = myTableAT.oldHTML;
 			myTableHE.innerHTML = myTableHE.oldHTML;
+
 			var data = JSON.stringify(obj);
-			//send request post
 			var xhr = new XMLHttpRequest();
 			var url = "carregar";
 			xhr.open("POST", url, true);
@@ -113,15 +123,18 @@ $(document).ready(function () {
 
 //BOTÃO CALCULO ATRASOS 
 $(document).ready(function () {
+
+	//CRIA BACKUP DAS LINHAS DA TABELA DE ATRASO
 	var myTableAT = document.getElementById("tab_logicAT");
 	myTableAT.oldHTML = myTableAT.innerHTML;
+
 	$("#btn_calc_at").on("click", function () {
-		//CRIA JSON COM HT E MF		
 		var obj = new Object();
 		var sizetableHt = document.getElementById("tab_logicHT").rows.length;
 		var sizetableMf = document.getElementById("tab_logicMF").rows.length;
 		let myvar;
 		obj = new Object();
+
 		//DADOS DO HORARIO DE TRABALHO
 		var periodos = [];
 		for (let i = 1; i < sizetableHt - 1; i++) {
@@ -134,8 +147,10 @@ $(document).ready(function () {
 				periodos.push($("[name=" + myvar + "]")[0].value);
 			}
 		}
+
 		//DIVISOR NA LISTA ENTRE HT E MF
 		periodos.push("-");
+
 		//DADOS DAS MARCACOES FEITAS
 		for (let i = 1; i < sizetableMf - 1; i++) {
 			myvar = "entrada_MF" + i;
@@ -147,11 +162,15 @@ $(document).ready(function () {
 				periodos.push($("[name=" + myvar + "]")[0].value);
 			}
 		}
+
+		//ADD LISTA DE PERIODOS NO OBJ
 		obj.periodos = periodos;
+
+		//RESTAURA ESTADO INICIAL DA TABELA ANTES DE POPULAR COM OS ATRASOS		
 		myTableAT.innerHTML = myTableAT.oldHTML;
+
 		var data = JSON.stringify(obj);
 		console.log(JSON.stringify(obj));
-		//send request post		
 		var xhr = new XMLHttpRequest();
 		var url = "atrasos";
 		xhr.open("POST", url, true);
@@ -167,14 +186,17 @@ $(document).ready(function () {
 
 //BOTÃO CALCULO HORAEXTRA 
 $(document).ready(function () {
+
+	//CRIA BACKUP DAS LINHAS DA TABELA DE HORAEXTRA
 	var myTableHE = document.getElementById("tab_logicHE");
 	myTableHE.oldHTML = myTableHE.innerHTML;
+
 	$("#btn_calc_he").on("click", function () {
-		//CRIA JSON COM HT E MF
 		var obj = new Object();
 		var sizetableHt = document.getElementById("tab_logicHT").rows.length;
 		var sizetableMf = document.getElementById("tab_logicMF").rows.length;
 		let myvar;
+
 		//DADOS DO HORARIO DE TRABALHO
 		var periodos = [];
 		for (let i = 1; i < sizetableHt - 1; i++) {
@@ -187,8 +209,10 @@ $(document).ready(function () {
 				periodos.push($("[name=" + myvar + "]")[0].value);
 			}
 		}
+
 		//DIVISOR NA LISTA ENTRE HT E MF
 		periodos.push("-");
+
 		//DADOS DAS MARCACOES FEITAS
 		for (let i = 1; i < sizetableMf - 1; i++) {
 			myvar = "entrada_MF" + i;
@@ -200,11 +224,14 @@ $(document).ready(function () {
 				periodos.push($("[name=" + myvar + "]")[0].value);
 			}
 		}
+
+		//ADD LISTA DE PERIODOS NO OBJ
 		obj.periodos = periodos;
-		//convert object to json string
+
+		//RESTAURA ESTADO INICIAL DA TABELA ANTES DE POPULAR COM AS HORAS EXTRAS	
 		myTableHE.innerHTML = myTableHE.oldHTML;
+
 		var data = JSON.stringify(obj);
-		//send request post		
 		var xhr = new XMLHttpRequest();
 		var url = "horaextra";
 		xhr.open("POST", url, true);
@@ -219,10 +246,16 @@ $(document).ready(function () {
 });
 
 function addHistorico(jsonobj) {
+
+	//CONVERTE STRINGJSON EM OBJ JSON
 	var jsonPeriodos = JSON.parse(jsonobj);
+
 	if (jsonPeriodos.periodos[0] != "vazio") {
 		alert("Informações salvas com sucesso!");
+
+		//APÓS SALVAR RESTAURA PÁGINA NO MODO INICIAL
 		window.location = window.location.href;
+
 	} else if (jsonPeriodos.periodos[0] == "vazio") {
 		alert("Erro ao salvar informações!");
 	} else {
@@ -231,7 +264,10 @@ function addHistorico(jsonobj) {
 }
 
 function loadHistorico(jsonobj) {
+
+	//CONVERTE STRINGJSON EM OBJ JSON
 	var jsonPeriodos = JSON.parse(jsonobj);
+
 	if (jsonPeriodos.periodos[0] != "vazio") {
 
 		const periodosHT = [];
@@ -286,7 +322,10 @@ function loadHistorico(jsonobj) {
 }
 
 function addLinesListHT(periodosHT) {
+
+	//CALCULA QTAS LINHAS PRECISA ADC (QTDD DE PERIODOS DIV 2 (2 PERIODOS POR LINHA DA TABELA ENTRADA/SAIDA))
 	let numrowtoadd = periodosHT.length / 2 - 1;
+
 	//LAÇO QUE ADD A QTDD DE LINHAS NECESSÁRIAS	
 	for (let i = 0; i < numrowtoadd; i++) {
 		var newid = 0;
@@ -300,11 +339,9 @@ function addLinesListHT(periodosHT) {
 			id: "addr" + newid,
 			"data-id": newid
 		});
-		// loop through each td and create new elements with name of newid
 		$.each($("#tab_logicHT tbody tr:nth(0) td"), function () {
 			var cur_td = $(this);
 			var children = cur_td.children();
-			// add new td and element if it has a nane			
 			if ($(this).data("name") != undefined) {
 				var td = $("<td></td>", {
 					"data-name": $(cur_td).data("name")
@@ -319,6 +356,7 @@ function addLinesListHT(periodosHT) {
 				}).appendTo($(tr));
 			}
 		});
+
 		// add delete button and td       
 		$("<td></td>").append(
 			$('<button class="btnic btn btn-danger row-remove"><i class="fa fa-close"></i></button>')
@@ -326,12 +364,15 @@ function addLinesListHT(periodosHT) {
 					$(this).closest("tr").remove();
 				})
 		).appendTo($(tr));
+
 		// add the new row
 		$(tr).appendTo($('#tab_logicHT'));
+
 		$(tr).find("td button.row-remove").on("click", function () {
 			$(this).closest("tr").remove();
 		});
 	}
+
 	//PREENCHE VALORES DAS LINHAS ADCIONADAS
 	let j = 0;
 	for (let i = 0; i < periodosHT.length / 2; i++) {
@@ -344,7 +385,10 @@ function addLinesListHT(periodosHT) {
 }
 
 function addLinesListMF(periodosMF) {
+
+	//CALCULA QTAS LINHAS PRECISA ADC (QTDD DE PERIODOS DIV 2 (2 PERIODOS POR LINHA DA TABELA ENTRADA/SAIDA))
 	let numrowtoadd = periodosMF.length / 2 - 1;
+
 	//LAÇO QUE ADD A QTDD DE LINHAS NECESSÁRIAS	
 	for (let i = 0; i < numrowtoadd; i++) {
 		var newid = 0;
@@ -358,11 +402,10 @@ function addLinesListMF(periodosMF) {
 			id: "addr" + newid,
 			"data-id": newid
 		});
-		// loop through each td and create new elements with name of newid
+
 		$.each($("#tab_logicMF tbody tr:nth(0) td"), function () {
 			var cur_td = $(this);
 			var children = cur_td.children();
-			// add new td and element if it has a nane			
 			if ($(this).data("name") != undefined) {
 				var td = $("<td></td>", {
 					"data-name": $(cur_td).data("name")
@@ -377,6 +420,7 @@ function addLinesListMF(periodosMF) {
 				}).appendTo($(tr));
 			}
 		});
+
 		// add delete button and td       
 		$("<td></td>").append(
 			$('<button class="btnic btn btn-danger row-remove"><i class="fa fa-close"></i></button>')
@@ -384,8 +428,10 @@ function addLinesListMF(periodosMF) {
 					$(this).closest("tr").remove();
 				})
 		).appendTo($(tr));
+
 		// add the new row
 		$(tr).appendTo($('#tab_logicMF'));
+
 		$(tr).find("td button.row-remove").on("click", function () {
 			$(this).closest("tr").remove();
 		});
@@ -402,7 +448,10 @@ function addLinesListMF(periodosMF) {
 }
 
 function addLinesListAT(periodosAT) {
+
+	//CALCULA QTAS LINHAS PRECISA ADC (QTDD DE PERIODOS DIV 2 (2 PERIODOS POR LINHA DA TABELA ENTRADA/SAIDA))
 	let numrowtoadd = periodosAT.length / 2 - 1;
+
 	//LAÇO QUE ADD A QTDD DE LINHAS NECESSÁRIAS	
 	for (let i = 0; i < numrowtoadd; i++) {
 		var newid = 0;
@@ -416,11 +465,10 @@ function addLinesListAT(periodosAT) {
 			id: "addr" + newid,
 			"data-id": newid
 		});
-		// loop through each td and create new elements with name of newid
+
 		$.each($("#tab_logicAT tbody tr:nth(0) td"), function () {
 			var cur_td = $(this);
 			var children = cur_td.children();
-			// add new td and element if it has a nane			
 			if ($(this).data("name") != undefined) {
 				var td = $("<td></td>", {
 					"data-name": $(cur_td).data("name")
@@ -435,6 +483,7 @@ function addLinesListAT(periodosAT) {
 				}).appendTo($(tr));
 			}
 		});
+
 		// add delete button and td       
 		$("<td></td>").append(
 			$('<button class="btnic btn btn-danger row-remove"><i class="fa fa-close"></i></button>')
@@ -442,8 +491,10 @@ function addLinesListAT(periodosAT) {
 					$(this).closest("tr").remove();
 				})
 		).appendTo($(tr));
+
 		// add the new row
 		$(tr).appendTo($('#tab_logicAT'));
+
 		$(tr).find("td button.row-remove").on("click", function () {
 			$(this).closest("tr").remove();
 		});
@@ -460,7 +511,10 @@ function addLinesListAT(periodosAT) {
 }
 
 function addLinesListHE(periodosHE) {
+
+	//CALCULA QTAS LINHAS PRECISA ADC (QTDD DE PERIODOS DIV 2 (2 PERIODOS POR LINHA DA TABELA ENTRADA/SAIDA))
 	let numrowtoadd = periodosHE.length / 2 - 1;
+
 	//LAÇO QUE ADD A QTDD DE LINHAS NECESSÁRIAS	
 	for (let i = 0; i < numrowtoadd; i++) {
 		var newid = 0;
@@ -474,11 +528,10 @@ function addLinesListHE(periodosHE) {
 			id: "addr" + newid,
 			"data-id": newid
 		});
-		// loop through each td and create new elements with name of newid
+
 		$.each($("#tab_logicHE tbody tr:nth(0) td"), function () {
 			var cur_td = $(this);
 			var children = cur_td.children();
-			// add new td and element if it has a nane			
 			if ($(this).data("name") != undefined) {
 				var td = $("<td></td>", {
 					"data-name": $(cur_td).data("name")
@@ -493,6 +546,7 @@ function addLinesListHE(periodosHE) {
 				}).appendTo($(tr));
 			}
 		});
+
 		// add delete button and td       
 		$("<td></td>").append(
 			$('<button class="btnic btn btn-danger row-remove"><i class="fa fa-close"></i></button>')
@@ -500,8 +554,10 @@ function addLinesListHE(periodosHE) {
 					$(this).closest("tr").remove();
 				})
 		).appendTo($(tr));
+
 		// add the new row
 		$(tr).appendTo($('#tab_logicHE'));
+
 		$(tr).find("td button.row-remove").on("click", function () {
 			$(this).closest("tr").remove();
 		});
@@ -518,7 +574,10 @@ function addLinesListHE(periodosHE) {
 }
 
 function addLinesAtrasos(jsonobj) {
+
+	//CALCULA QTAS LINHAS PRECISA ADC (QTDD DE PERIODOS DIV 2 (2 PERIODOS POR LINHA DA TABELA ENTRADA/SAIDA))
 	let numrowtoadd = jsonobj.periodos.length / 2 - 1;
+
 	//LAÇO QUE ADD A QTDD DE LINHAS NECESSÁRIAS	
 	for (let i = 0; i < numrowtoadd; i++) {
 		var newid = 0;
@@ -532,11 +591,10 @@ function addLinesAtrasos(jsonobj) {
 			id: "addr" + newid,
 			"data-id": newid
 		});
-		// loop through each td and create new elements with name of newid
+
 		$.each($("#tab_logicAT tbody tr:nth(0) td"), function () {
 			var cur_td = $(this);
 			var children = cur_td.children();
-			// add new td and element if it has a nane			
 			if ($(this).data("name") != undefined) {
 				var td = $("<td></td>", {
 					"data-name": $(cur_td).data("name")
@@ -551,6 +609,7 @@ function addLinesAtrasos(jsonobj) {
 				}).appendTo($(tr));
 			}
 		});
+
 		// add delete button and td
 		$("<td></td>").append(
 			$('<button class="btnic btn btn-danger row-remove"><i class="fa fa-close"></i></button>')
@@ -558,8 +617,10 @@ function addLinesAtrasos(jsonobj) {
 					$(this).closest("tr").remove();
 				})
 		).appendTo($(tr));
+
 		// add the new row
 		$(tr).appendTo($('#tab_logicAT'));
+
 		$(tr).find("td button.row-remove").on("click", function () {
 			$(this).closest("tr").remove();
 		});
@@ -577,7 +638,10 @@ function addLinesAtrasos(jsonobj) {
 }
 
 function addLinesHoraExtra(jsonobj) {
+
+	//CALCULA QTAS LINHAS PRECISA ADC (QTDD DE PERIODOS DIV 2 (2 PERIODOS POR LINHA DA TABELA ENTRADA/SAIDA))
 	let numrowtoadd = jsonobj.periodos.length / 2 - 1;
+
 	//LAÇO QUE ADD A QTDD DE LINHAS NECESSÁRIAS	
 	for (let i = 0; i < numrowtoadd; i++) {
 		var newid = 0;
@@ -591,11 +655,10 @@ function addLinesHoraExtra(jsonobj) {
 			id: "addr" + newid,
 			"data-id": newid
 		});
-		// loop through each td and create new elements with name of newid
+
 		$.each($("#tab_logicHE tbody tr:nth(0) td"), function () {
 			var cur_td = $(this);
 			var children = cur_td.children();
-			// add new td and element if it has a nane			
 			if ($(this).data("name") != undefined) {
 				var td = $("<td></td>", {
 					"data-name": $(cur_td).data("name")
@@ -610,6 +673,7 @@ function addLinesHoraExtra(jsonobj) {
 				}).appendTo($(tr));
 			}
 		});
+
 		// add delete button and td       
 		$("<td></td>").append(
 			$('<button class="btnic btn btn-danger row-remove"><i class="fa fa-close"></i></button>')
@@ -617,12 +681,15 @@ function addLinesHoraExtra(jsonobj) {
 					$(this).closest("tr").remove();
 				})
 		).appendTo($(tr));
+
 		// add the new row
 		$(tr).appendTo($('#tab_logicHE'));
+
 		$(tr).find("td button.row-remove").on("click", function () {
 			$(this).closest("tr").remove();
 		});
 	}
+
 	//PREENCHE VALORES DAS LINHAS ADCIONADAS
 	let j = 0;
 	for (let i = 0; i < jsonobj.periodos.length / 2; i++) {
@@ -636,6 +703,8 @@ function addLinesHoraExtra(jsonobj) {
 
 //TABELA HORARIO DE TRABALHO
 $(document).ready(function () {
+
+	//FUNÇÃO QUE ADD NOVA LINHA
 	$("#add_rowHT").on("click", function () {
 		var newid = 0;
 		$.each($("#tab_logicHT tr"), function () {
@@ -651,11 +720,10 @@ $(document).ready(function () {
 				id: "addr" + newid,
 				"data-id": newid
 			});
-			// loop through each td and create new elements with name of newid
+
 			$.each($("#tab_logicHT tbody tr:nth(0) td"), function () {
 				var cur_td = $(this);
 				var children = cur_td.children();
-				// add new td and element if it has a nane
 				if ($(this).data("name") != undefined) {
 					var td = $("<td></td>", {
 						"data-name": $(cur_td).data("name")
@@ -670,6 +738,7 @@ $(document).ready(function () {
 					}).appendTo($(tr));
 				}
 			});
+
 			// add delete button and td
 			$("<td></td>").append(
 				$('<button class="btnic btn btn-danger row-remove"><i class="fa fa-close"></i></button>')
@@ -677,8 +746,10 @@ $(document).ready(function () {
 						$(this).closest("tr").remove();
 					})
 			).appendTo($(tr));
+
 			// add the new row
 			$(tr).appendTo($('#tab_logicHT'));
+
 			$(tr).find("td button.row-remove").on("click", function () {
 				$(this).closest("tr").remove();
 			});
@@ -688,8 +759,10 @@ $(document).ready(function () {
 });
 //TABELA MARCAÇÕES FEITAS
 $(document).ready(function () {
+
+	//FUNÇÃO QUE ADD NOVA LINHA
 	$("#add_rowMF").on("click", function () {
-		// Get max row id and set new id
+
 		var newid = 0;
 		$.each($("#tab_logicMF tr"), function () {
 			if (parseInt($(this).data("id")) > newid) {
@@ -701,11 +774,10 @@ $(document).ready(function () {
 			id: "addr" + newid,
 			"data-id": newid
 		});
-		// loop through each td and create new elements with name of newid
+
 		$.each($("#tab_logicMF tbody tr:nth(0) td"), function () {
 			var cur_td = $(this);
 			var children = cur_td.children();
-			// add new td and element if it has a nane
 			if ($(this).data("name") != undefined) {
 				var td = $("<td></td>", {
 					"data-name": $(cur_td).data("name")
@@ -720,6 +792,7 @@ $(document).ready(function () {
 				}).appendTo($(tr));
 			}
 		});
+
 		// add delete button and td  
 		$("<td></td>").append(
 			$('<button class="btnic btn btn-danger row-remove"><i class="fa fa-close"></i></button>')
@@ -727,8 +800,10 @@ $(document).ready(function () {
 					$(this).closest("tr").remove();
 				})
 		).appendTo($(tr));
+
 		// add the new row
 		$(tr).appendTo($('#tab_logicMF'));
+
 		$(tr).find("td button.row-remove").on("click", function () {
 			$(this).closest("tr").remove();
 		});

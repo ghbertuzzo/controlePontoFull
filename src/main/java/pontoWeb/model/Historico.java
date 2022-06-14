@@ -8,7 +8,7 @@ public class Historico {
 	private int id_mf;
 	private int id_he;
 	private int id_at;
-	
+
 	public Historico(java.sql.Date date, int id, int id_ht, int id_mf, int id_he, int id_at) {
 		this.date = date;
 		this.id = id;
@@ -33,7 +33,7 @@ public class Historico {
 	public void setId(int id) {
 		this.id = id;
 	}
-	
+
 	public int getId_ht() {
 		return id_ht;
 	}
@@ -64,6 +64,6 @@ public class Historico {
 
 	public void setId_at(int id_at) {
 		this.id_at = id_at;
-	}	
-	
+	}
+
 }

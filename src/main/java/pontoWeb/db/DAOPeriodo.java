@@ -32,7 +32,7 @@ public class DAOPeriodo {
 		ps.close();
 		return periodo;
 	}
-	
+
 	public int insert(int entry, int exit) throws SQLException {
 		String querysql = "INSERT INTO \"schemaControlePonto\".periodo(id, entry, exit) VALUES (default, ?, ?);";
 		String generatedColumns[] = { "id" };

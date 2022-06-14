@@ -13,7 +13,7 @@ public class DAO_At_Periodo {
 	public DAO_At_Periodo(ConnectionFactoryDB connection) throws SQLException {
 		this.connection = connection;
 	}
-	
+
 	public List<Integer> getPeriods(int idAT) throws SQLException {
 		List<Integer> listIds = new ArrayList<Integer>();
 		String querysql = "SELECT id_periodo FROM \"schemaControlePonto\".at_periodo WHERE id_at = ?;";
@@ -27,7 +27,7 @@ public class DAO_At_Periodo {
 		ps.close();
 		return listIds;
 	}
-	
+
 	public void insert(int idAt, int idPeriodo) throws SQLException {
 		String querysql = "INSERT INTO \"schemaControlePonto\".at_periodo(id, id_at, id_periodo) VALUES (default, ?, ?);";
 		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql);

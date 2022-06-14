@@ -37,20 +37,20 @@ public class ServletCarregar extends HttpServlet {
 			this.connection = new ConnectionFactoryDB();
 			// CONVERTE P/ JSONSTR CONTEÚDO DA REQUEST
 			String requestData = request.getReader().lines().collect(Collectors.joining());
-			
-			//BUSCA HISTÓRICO
+
+			// BUSCA HISTÓRICO
 			HistoricoController historicoController = new HistoricoController(this.connection);
 			historico = historicoController.getHistorico(requestData);
-			
-			//SE EXISTE HISTORICO FAZ:
-			if(historico!=null) {
-				//GERA LISTA DE PERIODOS COMPLETA
-				JSON_Periodos listaPeriodos = historicoController.generateListPeriods(historico);				
-				
-				//CONVERTE LISTA EM STRING JSON
+
+			// SE EXISTE HISTORICO FAZ:
+			if (historico != null) {
+				// GERA LISTA DE PERIODOS COMPLETA
+				JSON_Periodos listaPeriodos = historicoController.generateListPeriods(historico);
+
+				// CONVERTE LISTA EM STRING JSON
 				Gson gson = new Gson();
 				String listaPeriodosJSONStr = gson.toJson(listaPeriodos);
-				
+
 				// CONVERTE STRING EM JSON
 				JsonObject listaAtrasosJSON = new Gson().fromJson(listaPeriodosJSONStr, JsonObject.class);
 
@@ -59,13 +59,13 @@ public class ServletCarregar extends HttpServlet {
 				response.setContentType("application/json");
 				response.setCharacterEncoding("UTF-8");
 				out.print(listaAtrasosJSON);
-				out.flush();				
+				out.flush();
 			} else {
 				JSON_Periodos listaPeriodos = new JSON_Periodos();
 				listaPeriodos.getPeriodos().add("vazio");
 				Gson gson = new Gson();
 				String listaPeriodosJSONStr = gson.toJson(listaPeriodos);
-				
+
 				// CONVERTE STR EM JSON
 				JsonObject listaAtrasosJSON = new Gson().fromJson(listaPeriodosJSONStr, JsonObject.class);
 
@@ -76,12 +76,12 @@ public class ServletCarregar extends HttpServlet {
 				out.print(listaAtrasosJSON);
 				out.flush();
 			}
-			
+
 		} catch (ClassNotFoundException | SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		}	
-		
+		}
+
 	}
 
 }

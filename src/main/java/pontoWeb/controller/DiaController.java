@@ -48,37 +48,39 @@ public class DiaController {
 
 	public Dia getConvertedDayHT(String json) {
 		Gson gson = new Gson();
-		JSON_Periodos listPeriods = gson.fromJson(json, JSON_Periodos.class);   
-		ArrayList<Periodo> periodArray = new ArrayList<Periodo>();		
-		for(int i= 0; i<listPeriods.getPeriodos().size();i++) {
-			if(listPeriods.getPeriodos().get(i).equals("-")) {
+		JSON_Periodos listPeriods = gson.fromJson(json, JSON_Periodos.class);
+		ArrayList<Periodo> periodArray = new ArrayList<Periodo>();
+		for (int i = 0; i < listPeriods.getPeriodos().size(); i++) {
+			if (listPeriods.getPeriodos().get(i).equals("-")) {
 				break;
 			} else {
-				Periodo p = new Periodo(LocalTime.parse(listPeriods.getPeriodos().get(i)),LocalTime.parse(listPeriods.getPeriodos().get(i+1)));
+				Periodo p = new Periodo(LocalTime.parse(listPeriods.getPeriodos().get(i)),
+						LocalTime.parse(listPeriods.getPeriodos().get(i + 1)));
 				periodArray.add(p);
 				i++;
 			}
-		}		
+		}
 		PeriodoController periodoController = new PeriodoController();
 		Dia diaHT = periodoController.setPeriods(periodArray);
 		return diaHT;
 	}
 
 	public Dia getConvertedDayMF(String json) {
-		Gson gson = new Gson(); 
-		JSON_Periodos listPeriods = gson.fromJson(json, JSON_Periodos.class);   
+		Gson gson = new Gson();
+		JSON_Periodos listPeriods = gson.fromJson(json, JSON_Periodos.class);
 		ArrayList<Periodo> periodArray = new ArrayList<Periodo>();
 		int index = -1;
-		for(int i= 0; i<listPeriods.getPeriodos().size();i++) {
-			if(listPeriods.getPeriodos().get(i).equals("-")) {
-				index = i+1;
-			} 
+		for (int i = 0; i < listPeriods.getPeriodos().size(); i++) {
+			if (listPeriods.getPeriodos().get(i).equals("-")) {
+				index = i + 1;
+			}
 		}
-		for(int j = index; j<listPeriods.getPeriodos().size();j++){
-			Periodo p = new Periodo(LocalTime.parse(listPeriods.getPeriodos().get(j)),LocalTime.parse(listPeriods.getPeriodos().get(j+1)));
+		for (int j = index; j < listPeriods.getPeriodos().size(); j++) {
+			Periodo p = new Periodo(LocalTime.parse(listPeriods.getPeriodos().get(j)),
+					LocalTime.parse(listPeriods.getPeriodos().get(j + 1)));
 			periodArray.add(p);
 			j++;
-		}		
+		}
 		PeriodoController periodoController = new PeriodoController();
 		Dia diaMF = periodoController.setPeriods(periodArray);
 		return diaMF;

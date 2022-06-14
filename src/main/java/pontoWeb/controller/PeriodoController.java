@@ -90,8 +90,8 @@ public class PeriodoController {
 
 	public long sumBetweenPeriods(List<Periodo> listPeriods) {
 		long minutesSum = 0;
-		for(Periodo periodo: listPeriods) {
-			minutesSum += ChronoUnit.MINUTES.between(periodo.getEntrada(),periodo.getSaida());
+		for (Periodo periodo : listPeriods) {
+			minutesSum += ChronoUnit.MINUTES.between(periodo.getEntrada(), periodo.getSaida());
 		}
 		return minutesSum;
 	}

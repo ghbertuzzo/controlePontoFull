@@ -22,7 +22,7 @@ public class DAO_Mf_Periodo {
 		ps.execute();
 		ps.close();
 	}
-	
+
 	public List<Integer> getPeriods(int idMF) throws SQLException {
 		List<Integer> listIds = new ArrayList<Integer>();
 		String querysql = "SELECT id_periodo FROM \"schemaControlePonto\".mf_periodo WHERE id_mf = ?;";
@@ -32,7 +32,7 @@ public class DAO_Mf_Periodo {
 		rs = ps.executeQuery();
 		while (rs.next()) {
 			listIds.add(rs.getInt(1));
-		}		
+		}
 		ps.close();
 		return listIds;
 	}

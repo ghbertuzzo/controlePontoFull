@@ -46,18 +46,21 @@ public class HistoricoController {
 		this.daoHistorico = new DAOHistorico(this.connection);
 	}
 
-	public void generateReportHistorico(List<Historico> historicos, ConnectionFactoryDB connection, String path, HttpServletRequest request)
+	public void generateReportHistorico(List<Historico> historicos, ConnectionFactoryDB connection, String path,
+			HttpServletRequest request)
 			throws ClassNotFoundException, SQLException, FileNotFoundException, JRException {
 		List<ExtratoDia> listExtrato = getListExtrato(historicos, connection);
 		generateReportWeb(listExtrato, path, request);
 	}
 
-	public void generateReportWeb(List<ExtratoDia> listExtrato, String path, HttpServletRequest request) throws FileNotFoundException, JRException {
-		String caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports"+ File.separator + "myreport.pdf");
+	public void generateReportWeb(List<ExtratoDia> listExtrato, String path, HttpServletRequest request)
+			throws FileNotFoundException, JRException {
+		String caminho = request.getSession().getServletContext()
+				.getRealPath("WEB-INF/classes/pontoWeb/reports" + File.separator + "myreport.pdf");
 		JRBeanCollectionDataSource itensJRBean = new JRBeanCollectionDataSource(listExtrato);
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("CollectionBeanParam", itensJRBean);
-		InputStream input = new FileInputStream(new File(path));		
+		InputStream input = new FileInputStream(new File(path));
 		JasperDesign jasperDesign = JRXmlLoader.load(input);
 		JasperReport jr = JasperCompileManager.compileReport(jasperDesign);
 		JasperPrint jasperPrint = JasperFillManager.fillReport(jr, parameters, itensJRBean);
@@ -104,7 +107,7 @@ public class HistoricoController {
 		return this.daoHistorico.getHistoricos(connection);
 	}
 
-	public void generateReport(ConnectionFactoryDB connection, String path,HttpServletRequest request)
+	public void generateReport(ConnectionFactoryDB connection, String path, HttpServletRequest request)
 			throws SQLException, ClassNotFoundException, FileNotFoundException, JRException {
 		List<Historico> listaHistorico = getHistoricos(connection);
 		if (listaHistorico != null) {

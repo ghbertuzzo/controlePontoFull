@@ -15,7 +15,7 @@ public class DAOMarcacoesFeitas {
 	public Integer insert() throws SQLException {
 		String querysql = "INSERT INTO \"schemaControlePonto\".marcacoes_feitas (id) VALUES (DEFAULT);";
 		String generatedColumns[] = { "id" };
-		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql, generatedColumns);		
+		PreparedStatement ps = this.connection.getConnection().prepareStatement(querysql, generatedColumns);
 		int affectedRows = ps.executeUpdate();
 		long id = -1;
 		if (affectedRows > 0) {

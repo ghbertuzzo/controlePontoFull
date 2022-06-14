@@ -18,7 +18,7 @@ import pontoWeb.db.ConnectionFactoryDB;
 
 @WebServlet(urlPatterns = { "/export" })
 public class ServletReport extends HttpServlet {
-	
+
 	private static final long serialVersionUID = 1L;
 	private HistoricoController historicoController;
 	private ConnectionFactoryDB connection;
@@ -27,12 +27,13 @@ public class ServletReport extends HttpServlet {
 
 	}
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response)
+			throws ServletException, IOException {
 		String caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports" + File.separator + "RelatorioExtratoDia_2.jrxml");
 		try {
 			this.connection = new ConnectionFactoryDB();
 			this.historicoController = new HistoricoController(connection);
-			this.historicoController.generateReport(this.connection,caminho,request);
+			this.historicoController.generateReport(this.connection, caminho, request);
 		} catch (ClassNotFoundException | SQLException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -40,35 +41,29 @@ public class ServletReport extends HttpServlet {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-        response.setContentType("application/pdf");
-        response.setHeader("Content-Type", "application/pdf");
-        response.addHeader("Content-Disposition", "attachment; filename=report.pdf");
-        caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports/");
-        File filePDF = new File(caminho + "myreport.pdf");
-        FileInputStream fis = new FileInputStream(filePDF);     
-        ServletOutputStream os = response.getOutputStream();
-        
-        try
-        {
-            response.setContentLength((int) filePDF.length());
-            int byteRead = 0;
-            while ((byteRead = fis.read()) != -1)
-            {
-                os.write(byteRead);
-            }
-            os.flush();
-        }
-        catch (Exception excp)
-        {
-            excp.printStackTrace();
-        }
-        finally
-        {
-            os.close();
-            fis.close();
-        }
-				
+
+		response.setContentType("application/pdf");
+		response.setHeader("Content-Type", "application/pdf");
+		response.addHeader("Content-Disposition", "attachment; filename=report.pdf");
+		caminho = request.getSession().getServletContext().getRealPath("WEB-INF/classes/pontoWeb/reports/");
+		File filePDF = new File(caminho + "myreport.pdf");
+		FileInputStream fis = new FileInputStream(filePDF);
+		ServletOutputStream os = response.getOutputStream();
+
+		try {
+			response.setContentLength((int) filePDF.length());
+			int byteRead = 0;
+			while ((byteRead = fis.read()) != -1) {
+				os.write(byteRead);
+			}
+			os.flush();
+		} catch (Exception excp) {
+			excp.printStackTrace();
+		} finally {
+			os.close();
+			fis.close();
+		}
+
 	}
 
 }
