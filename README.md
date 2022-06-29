@@ -1,12 +1,12 @@
-# controlePontoFull
+# Controle Ponto Web Full
 
-Sistema HTTP web que calcula/armazena/exporta atraso e hora extra embasados em um horário de trabalho e marcações feitas.
+Sistema web que calcula/armazena/exporta atraso e hora extra embasados em um horário de trabalho e marcações feitas.
 
 ![print-sistema](https://user-images.githubusercontent.com/12899288/176553982-7720c9cf-dd3f-4afb-a759-df65e7a886d3.png)
 
 
 Backend:
-Java 8 + Tomcat 8.5 + Postgres 42.3.6
+Java 8 (com servlet) + Tomcat 8.5 + Postgres 42.3.6
 
 Frontend:
 Javascript + bootstrap + jquery
